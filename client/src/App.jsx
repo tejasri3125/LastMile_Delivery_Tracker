@@ -5,14 +5,21 @@ import CustomerPortal from './components/CustomerPortal';
 import AgentPortal from './components/AgentPortal';
 import AdminPortal from './components/AdminPortal';
 import SystemDesignDocView from './components/SystemDesignDocView';
-import { RefreshCw, Shield, CheckCircle2 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+
+const DEFAULT_DEMO_USERS = [
+  { id: 1, name: 'Logistics Admin', email: 'admin@logistics.com', role: 'admin', phone: '+18005550199' },
+  { id: 2, name: 'Acme Enterprise Solutions', email: 'customer@acme.com', role: 'customer', phone: '+18004443322' },
+  { id: 3, name: 'Sarah Jenkins', email: 'sarah@gmail.com', role: 'customer', phone: '+19876543210' },
+  { id: 4, name: 'Rajesh Kumar (Agent)', email: 'agent.rajesh@logistics.com', role: 'agent', phone: '+919811122233' }
+];
 
 export default function App() {
   const [activeRole, setActiveRole] = useState('admin'); // 'admin', 'customer', 'agent'
   const [activeTab, setActiveTab] = useState('portal'); // 'portal', 'system-design'
-  const [user, setUser] = useState(null);
-  const [demoUsers, setDemoUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(DEFAULT_DEMO_USERS[0]);
+  const [demoUsers, setDemoUsers] = useState(DEFAULT_DEMO_USERS);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadDemoUsers();
@@ -21,30 +28,33 @@ export default function App() {
   const loadDemoUsers = async () => {
     try {
       const res = await AuthAPI.getDemoUsers();
-      setDemoUsers(res.data);
-      // Auto login as admin initially
-      loginAsRole('admin', res.data);
+      if (res.data && res.data.length > 0) {
+        setDemoUsers(res.data);
+        loginAsRole('admin', res.data);
+      }
     } catch (err) {
-      console.error('Failed to load demo users', err);
+      console.warn('Network auth sync warning, operating in client interactive mode:', err.message);
       setLoading(false);
     }
   };
 
   const loginAsRole = async (role, usersList = demoUsers) => {
-    setLoading(true);
-    const targetUser = usersList.find(u => u.role === role);
-    if (!targetUser) {
-      setLoading(false);
-      return;
+    const targetUser = usersList.find(u => u.role === role) || DEFAULT_DEMO_USERS.find(u => u.role === role);
+    if (targetUser) {
+      setUser(targetUser);
+      setActiveRole(role);
     }
 
     try {
-      const res = await AuthAPI.login(targetUser.email, 'password123');
-      localStorage.setItem('delivery_jwt_token', res.data.token);
-      setUser(res.data.user);
-      setActiveRole(role);
+      if (targetUser && targetUser.email) {
+        const res = await AuthAPI.login(targetUser.email, 'password123');
+        if (res.data && res.data.token) {
+          localStorage.setItem('delivery_jwt_token', res.data.token);
+          setUser(res.data.user);
+        }
+      }
     } catch (err) {
-      console.error('Login failed', err);
+      console.warn('API login sync warning:', err.message);
     } finally {
       setLoading(false);
     }
