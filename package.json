@@ -4,8 +4,8 @@
   "description": "Last-Mile Delivery Management Platform",
   "main": "server/index.js",
   "scripts": {
-    "postinstall": "cd server && npm install && cd ../client && npm install",
-    "build": "cd client && npm run build",
-    "start": "cd server && node index.js"
+    "postinstall": "npm install --prefix server && npm install --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "node server/index.js"
   }
 }
