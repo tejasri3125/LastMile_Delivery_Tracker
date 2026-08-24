@@ -2,6 +2,8 @@
 
 > A full-stack delivery management platform featuring dynamic rate calculation, volumetric weight estimation, dynamic zone detection, intelligent agent auto-assignment, immutable tracking history, failed delivery rescheduling flow, and role-based portals for Customers, Delivery Agents, and Admins.
 
+🌐 **Live Web Application Demo**: [https://last-mile-delivery-tracker-drab.vercel.app/](https://last-mile-delivery-tracker-drab.vercel.app/)
+
 ---
 
 ## 🌟 Key Features
