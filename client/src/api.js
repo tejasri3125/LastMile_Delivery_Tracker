@@ -1,7 +1,19 @@
 import axios from 'axios';
 
+// Dedicated Render Production API Endpoint
+const RENDER_BACKEND_URL = 'https://lastmile-delivery-tracker-7yrj.onrender.com/api';
+
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  // If running on Vercel frontend, connect directly to live Render backend API
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return RENDER_BACKEND_URL;
+  }
+  return '/api';
+};
+
 const api = axios.create({
-  baseURL: '/api'
+  baseURL: getBaseURL()
 });
 
 // Add Token interceptor
