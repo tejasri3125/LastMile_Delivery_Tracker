@@ -3,15 +3,22 @@ const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const dbPath = path.resolve(__dirname, 'delivery_tracker.sqlite');
+// Use /tmp directory on Vercel serverless environment to avoid read-only filesystem errors
+const dbPath = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME 
+  ? path.join('/tmp', 'delivery_tracker.sqlite') 
+  : path.resolve(__dirname, 'delivery_tracker.sqlite');
 
 let dbInstance = null;
 
 function saveDB() {
   if (dbInstance) {
-    const data = dbInstance.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(dbPath, buffer);
+    try {
+      const data = dbInstance.export();
+      const buffer = Buffer.from(data);
+      fs.writeFileSync(dbPath, buffer);
+    } catch (e) {
+      console.warn('DB Save warning:', e.message);
+    }
   }
 }
 
