@@ -1,0 +1,12 @@
+{
+  "name": "last-mile-delivery-tracker-root",
+  "version": "1.0.0",
+  "description": "Last-Mile Delivery Management Platform",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "start:server": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build:client": "cd client && npm run build"
+  }
+}
