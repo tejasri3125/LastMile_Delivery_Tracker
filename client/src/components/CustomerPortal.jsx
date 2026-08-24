@@ -3,14 +3,16 @@ import { OrderAPI } from '../api';
 import RateCalculatorModal from './RateCalculatorModal';
 import TrackingTimelineModal from './TrackingTimelineModal';
 import RescheduleModal from './RescheduleModal';
-import { Plus, Package, MapPin, Calendar, Clock, ArrowRight, RefreshCw, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Plus, Package, MapPin, Calendar, Clock, ArrowRight, RefreshCw, ShieldAlert, CheckCircle2, Search, Filter } from 'lucide-react';
 
-export default function CustomerPortal({ user }) {
+export default function CustomerPortal({ user, onOpenCalc }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCalcModal, setShowCalcModal] = useState(false);
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState(null);
   const [selectedOrderForReschedule, setSelectedOrderForReschedule] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
     fetchCustomerOrders();
@@ -46,99 +48,149 @@ export default function CustomerPortal({ user }) {
       setShowCalcModal(false);
       fetchCustomerOrders();
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to place order');
+      alert(err?.response?.data?.error || 'Failed to place order');
     }
   };
+
+  const filteredOrders = orders.filter(o => {
+    if (statusFilter && o.status !== statusFilter) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return (
+        o.tracking_number.toLowerCase().includes(q) ||
+        o.pickup_pincode.includes(q) ||
+        o.drop_pincode.includes(q)
+      );
+    }
+    return true;
+  });
 
   return (
     <div className="space-y-6">
       
-      {/* Header Banner */}
-      <div className="glass-card p-6 bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-950/40 border border-slate-700/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Welcome Banner */}
+      <div className="bg-[#E7F1EB] p-6 rounded-xl border border-[#176B4D]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
+          <span className="logi-badge-forest mb-2 inline-block">CUSTOMER PORTAL</span>
+          <h2 className="text-2xl font-bold text-[#1F2933] font-heading flex items-center gap-2">
             Welcome back, {user?.name || 'Valued Customer'} 👋
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage your B2B & B2C shipments, calculate dynamic charges, and track real-time delivery timelines.
+          <p className="text-xs text-[#667085] mt-1">
+            Manage your B2B & B2C shipments, calculate dynamic volumetric charges, and track real-time delivery timelines.
           </p>
         </div>
+        
         <button
           onClick={() => setShowCalcModal(true)}
-          className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-cyan-500/20 transition-all flex items-center gap-2"
+          className="logi-btn-primary px-5 py-2.5 shadow-md shadow-[#176B4D]/20 shrink-0"
         >
-          <Plus className="w-4 h-4 stroke-[3]" /> Create New Order (Auto-Pricing)
+          <Plus className="w-4 h-4 stroke-[3]" /> Create New Delivery
         </button>
       </div>
 
-      {/* Orders List */}
-      <div className="glass-card p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Package className="w-5 h-5 text-cyan-400" /> Your Orders ({orders.length})
+      {/* Orders List Container */}
+      <div className="logi-card p-6 space-y-4">
+        
+        {/* Header & Controls */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <h3 className="text-base font-bold text-[#1F2933] font-heading flex items-center gap-2">
+            <Package className="w-5 h-5 text-[#176B4D]" /> Active & Recent Shipments ({filteredOrders.length})
           </h3>
-          <button 
-            onClick={fetchCustomerOrders}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-xs font-medium flex items-center gap-1.5"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh List
-          </button>
+
+          {/* Search & Refresh */}
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <div className="relative flex-1 md:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input 
+                type="text"
+                placeholder="Search tracking # or pincode..."
+                className="logi-input w-full pl-9 py-1.5 text-xs"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <select
+              className="logi-input text-xs py-1.5"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="CREATED">CREATED</option>
+              <option value="ASSIGNED">ASSIGNED</option>
+              <option value="PICKED_UP">PICKED_UP</option>
+              <option value="IN_TRANSIT">IN_TRANSIT</option>
+              <option value="OUT_FOR_DELIVERY">OUT_FOR_DELIVERY</option>
+              <option value="DELIVERED">DELIVERED</option>
+              <option value="FAILED">FAILED</option>
+              <option value="RESCHEDULED">RESCHEDULED</option>
+            </select>
+
+            <button 
+              onClick={fetchCustomerOrders}
+              className="logi-btn-outline text-xs py-1.5"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            </button>
+          </div>
         </div>
 
+        {/* List Content */}
         {loading ? (
-          <div className="py-12 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
-            <RefreshCw className="w-6 h-6 animate-spin text-cyan-400" />
-            <span>Loading your shipment orders...</span>
+          <div className="py-16 text-center text-[#667085] flex flex-col items-center justify-center gap-2">
+            <RefreshCw className="w-6 h-6 animate-spin text-[#176B4D]" />
+            <span className="text-xs font-semibold">Loading shipment orders...</span>
           </div>
-        ) : orders.length === 0 ? (
-          <div className="py-12 text-center text-slate-500 space-y-3">
-            <Package className="w-12 h-12 mx-auto text-slate-700" />
-            <p className="text-sm font-medium">You haven't placed any delivery orders yet.</p>
+        ) : filteredOrders.length === 0 ? (
+          <div className="py-16 text-center text-[#667085] space-y-3">
+            <Package className="w-12 h-12 mx-auto text-slate-300" />
+            <p className="text-sm font-semibold text-[#1F2933]">No shipments found.</p>
+            <p className="text-xs text-[#667085]">Calculate delivery rate and place your first shipment!</p>
             <button
               onClick={() => setShowCalcModal(true)}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl"
+              className="logi-btn-primary mx-auto text-xs px-4 py-2"
             >
-              Calculate Rate & Place First Order
+              Calculate Rate & Place Order
             </button>
           </div>
         ) : (
           <div className="space-y-3">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <div 
                 key={order.id} 
                 className={`p-4 rounded-xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
                   order.status === 'FAILED' 
-                    ? 'bg-rose-950/30 border-rose-600/50 hover:border-rose-500' 
-                    : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
+                    ? 'bg-rose-50/50 border-rose-200' 
+                    : 'bg-white border-slate-200 hover:border-slate-300'
                 }`}
               >
                 {/* Order Details */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white text-sm">#{order.tracking_number}</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
-                      order.status === 'DELIVERED' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
-                      order.status === 'FAILED' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
-                      order.status === 'RESCHEDULED' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                      'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    }`}>
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono font-bold text-[#1F2933] text-sm">#{order.tracking_number}</span>
+                    <span className={
+                      order.status === 'DELIVERED' ? 'logi-badge-success' :
+                      order.status === 'FAILED' ? 'logi-badge-failed' :
+                      order.status === 'RESCHEDULED' ? 'logi-badge-amber' :
+                      'logi-badge-forest'
+                    }>
                       {order.status}
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 font-bold">
+                    <span className="px-2 py-0.5 rounded bg-slate-100 text-[10px] text-[#667085] font-bold">
                       {order.order_type} • {order.payment_type}
                     </span>
                   </div>
 
-                  <div className="text-xs text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1">
-                    <span>Pickup: <strong className="text-slate-200">{order.pickup_pincode}</strong></span>
+                  <div className="text-xs text-[#667085] flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <span>Pickup: <strong className="text-[#1F2933]">{order.pickup_pincode}</strong></span>
                     <span>→</span>
-                    <span>Drop: <strong className="text-slate-200">{order.drop_pincode}</strong></span>
-                    <span>Charge: <strong className="text-cyan-400 font-bold">₹{order.total_charge}</strong></span>
-                    <span>Billed Weight: <strong className="text-slate-200">{order.billed_weight_kg}kg</strong></span>
+                    <span>Drop: <strong className="text-[#1F2933]">{order.drop_pincode}</strong></span>
+                    <span>Charge: <strong className="text-[#176B4D] font-bold">₹{order.total_charge}</strong></span>
+                    <span>Billed Weight: <strong className="text-[#1F2933]">{order.billed_weight_kg}kg</strong></span>
                   </div>
 
                   {order.status === 'FAILED' && (
-                    <p className="text-xs text-rose-400 font-semibold flex items-center gap-1 mt-1">
+                    <p className="text-xs text-[#D9534F] font-semibold flex items-center gap-1 mt-1">
                       <ShieldAlert className="w-3.5 h-3.5" /> Failure Reason: {order.reschedule_reason || 'Delivery attempt failed'}
                     </p>
                   )}
@@ -149,7 +201,7 @@ export default function CustomerPortal({ user }) {
                   {order.status === 'FAILED' && (
                     <button
                       onClick={() => setSelectedOrderForReschedule(order)}
-                      className="px-3 py-1.5 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white text-xs font-bold rounded-lg shadow-md transition-all flex items-center gap-1"
+                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1 shadow-sm"
                     >
                       <RefreshCw className="w-3.5 h-3.5" /> Reschedule
                     </button>
@@ -157,9 +209,9 @@ export default function CustomerPortal({ user }) {
 
                   <button
                     onClick={() => setSelectedOrderForTracking(order.id)}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 text-xs font-semibold rounded-lg transition-all flex items-center gap-1"
+                    className="logi-btn-outline text-xs py-1.5"
                   >
-                    Track Live Timeline <ArrowRight className="w-3.5 h-3.5" />
+                    Track Timeline <ArrowRight className="w-3.5 h-3.5 text-[#176B4D]" />
                   </button>
                 </div>
               </div>

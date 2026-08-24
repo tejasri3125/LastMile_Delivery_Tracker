@@ -7,16 +7,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: '#f0f7ff',
-          100: '#e0effe',
-          500: '#0284c7',
-          600: '#0369a1',
-          700: '#075985',
-          900: '#0c4a6e',
-        }
+        forest: {
+          50: '#F2F7F4',
+          100: '#E7F1EB',
+          200: '#C5DEC9',
+          500: '#176B4D',
+          600: '#0F5138',
+          700: '#0B3E2B',
+          800: '#082E20',
+          900: '#041B13',
+        },
+        sage: '#E7F1EB',
+        offwhite: '#F8FAF7',
+        charcoal: '#1F2933',
+        muted: '#667085',
+        success: '#2E7D5B',
+        warning: '#F2B84B',
+        failed: '#D9534F'
+      },
+      fontFamily: {
+        sans: ['Inter', 'Manrope', 'sans-serif'],
+        heading: ['Manrope', 'Inter', 'sans-serif'],
       }
     },
   },
   plugins: [],
 }
+

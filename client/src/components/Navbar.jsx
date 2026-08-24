@@ -1,82 +1,140 @@
 import React from 'react';
-import { Truck, ShieldCheck, UserCheck, Cpu, User } from 'lucide-react';
+import { Truck, ShieldCheck, UserCheck, Cpu, User, Calculator, LogIn, LogOut, ChevronDown, Search } from 'lucide-react';
 
-export default function Navbar({ activeRole, demoUsers, onSwitchRole, activeTab, onSwitchTab }) {
+export default function Navbar({ activeRole, demoUsers, activeUser, onSwitchRole, activeTab, onSwitchTab, onOpenAuth, onOpenCalc }) {
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800 shadow-xl">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
         
-        {/* Brand Logo & Navigation */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-gradient-to-tr from-cyan-600 to-blue-600 rounded-xl shadow-lg shadow-cyan-500/20 text-white">
-              <Truck className="w-6 h-6 stroke-[2.5]" />
+        {/* Brand Logo & Main Nav */}
+        <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start">
+          <button 
+            onClick={() => { onSwitchTab('home'); }}
+            className="flex items-center gap-2.5 text-left group"
+          >
+            <div className="p-2 bg-[#176B4D] group-hover:bg-[#0F5138] rounded-xl shadow-sm text-white transition-colors">
+              <Truck className="w-5 h-5 stroke-[2.5]" />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
-                Last-Mile Delivery Tracker
+              <h1 className="text-lg font-extrabold text-[#1F2933] font-heading tracking-tight flex items-center gap-2">
+                LogiTrack
               </h1>
-              <p className="text-[11px] text-cyan-400 font-semibold tracking-wider">LOGISTICS MANAGEMENT PLATFORM</p>
+              <p className="text-[10px] text-[#176B4D] font-bold tracking-wider uppercase">LAST-MILE LOGISTICS PLATFORM</p>
             </div>
-          </div>
+          </button>
 
-          {/* View Switcher: Portal vs System Architecture Writeup */}
-          <div className="hidden sm:flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs">
+          {/* Nav Tabs */}
+          <nav className="hidden lg:flex items-center bg-[#F8FAF7] p-1 rounded-lg border border-slate-200 text-xs font-semibold">
             <button
-              onClick={() => onSwitchTab('portal')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                activeTab === 'portal' ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-white'
+              onClick={() => onSwitchTab('home')}
+              className={`px-3 py-1.5 rounded-md transition-all ${
+                activeTab === 'home' ? 'bg-white text-[#176B4D] font-bold shadow-sm' : 'text-[#667085] hover:text-[#1F2933]'
               }`}
             >
-              Interactive Portal
+              Home
             </button>
+
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('customer'); }}
+              className={`px-3 py-1.5 rounded-md transition-all ${
+                activeTab === 'portal' && activeRole === 'customer' ? 'bg-white text-[#176B4D] font-bold shadow-sm' : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+            >
+              Customer Portal
+            </button>
+
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('admin'); }}
+              className={`px-3 py-1.5 rounded-md transition-all ${
+                activeTab === 'portal' && activeRole === 'admin' ? 'bg-white text-[#176B4D] font-bold shadow-sm' : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+            >
+              Admin Dashboard
+            </button>
+
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('agent'); }}
+              className={`px-3 py-1.5 rounded-md transition-all ${
+                activeTab === 'portal' && activeRole === 'agent' ? 'bg-white text-[#176B4D] font-bold shadow-sm' : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+            >
+              Delivery Agent
+            </button>
+
             <button
               onClick={() => onSwitchTab('system-design')}
-              className={`px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1.5 ${
-                activeTab === 'system-design' ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20' : 'text-slate-400 hover:text-white'
+              className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1 ${
+                activeTab === 'system-design' ? 'bg-white text-[#176B4D] font-bold shadow-sm' : 'text-[#667085] hover:text-[#1F2933]'
               }`}
             >
-              <Cpu className="w-3.5 h-3.5" /> System Design Write-Up
+              <Cpu className="w-3.5 h-3.5" /> Architecture
             </button>
-          </div>
+          </nav>
         </div>
 
-        {/* Quick Role Switcher Bar */}
-        <div className="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
-          <span className="text-[11px] text-slate-400 font-bold px-2 hidden sm:inline">Role Switcher:</span>
-
+        {/* Quick Action CTAs & Auth Sign In Button */}
+        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+          
+          {/* Quick Rate Calculator Trigger */}
           <button
-            onClick={() => onSwitchRole('admin')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeRole === 'admin' 
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/30' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
+            onClick={onOpenCalc}
+            className="logi-btn-outline text-xs py-2 px-3 hidden sm:flex items-center gap-1.5"
+            title="Calculate Delivery Charges"
           >
-            <ShieldCheck className="w-3.5 h-3.5" /> Admin
+            <Calculator className="w-3.5 h-3.5 text-[#176B4D]" />
+            <span>Calculate Rate</span>
           </button>
 
+          {/* Quick Role Switcher */}
+          <div className="flex items-center bg-[#F8FAF7] p-1 rounded-lg border border-slate-200 text-xs">
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('customer'); }}
+              className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${
+                activeRole === 'customer' && activeTab === 'portal'
+                  ? 'bg-[#176B4D] text-white shadow-sm' 
+                  : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+              title="Switch to Customer Role"
+            >
+              <User className="w-3.5 h-3.5" /> Customer
+            </button>
+
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('admin'); }}
+              className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${
+                activeRole === 'admin' && activeTab === 'portal'
+                  ? 'bg-[#176B4D] text-white shadow-sm' 
+                  : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+              title="Switch to Admin Role"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" /> Admin
+            </button>
+
+            <button
+              onClick={() => { onSwitchTab('portal'); onSwitchRole('agent'); }}
+              className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 ${
+                activeRole === 'agent' && activeTab === 'portal'
+                  ? 'bg-[#176B4D] text-white shadow-sm' 
+                  : 'text-[#667085] hover:text-[#1F2933]'
+              }`}
+              title="Switch to Agent Role"
+            >
+              <UserCheck className="w-3.5 h-3.5" /> Agent
+            </button>
+          </div>
+
+          {/* Sign In / Account Button */}
           <button
-            onClick={() => onSwitchRole('customer')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeRole === 'customer' 
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
+            onClick={onOpenAuth}
+            className="logi-btn-primary py-2 px-3.5 text-xs shadow-sm"
           >
-            <User className="w-3.5 h-3.5" /> Customer
+            <LogIn className="w-3.5 h-3.5" />
+            <span className="font-bold">
+              {activeUser ? activeUser.name.split(' ')[0] : 'Sign In'}
+            </span>
           </button>
 
-          <button
-            onClick={() => onSwitchRole('agent')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeRole === 'agent' 
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/30' 
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" /> Agent
-          </button>
         </div>
 
       </div>

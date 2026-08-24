@@ -8,7 +8,7 @@ export default function NotificationSandbox() {
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 5000); // auto refresh every 5s
+    const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -24,20 +24,20 @@ export default function NotificationSandbox() {
   };
 
   return (
-    <div className="glass-card p-6 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="logi-card p-6 space-y-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-cyan-500/20 text-cyan-400 rounded-xl border border-cyan-500/40">
+          <div className="p-2 bg-[#E7F1EB] text-[#176B4D] rounded-lg">
             <Mail className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">Live Notification Sandbox Logs</h3>
-            <p className="text-xs text-slate-400">Real-time Email & SMS Customer Alerts Dispatcher</p>
+            <h3 className="text-base font-bold text-[#1F2933] font-heading">Live Notification Sandbox Logs</h3>
+            <p className="text-xs text-[#667085]">Real-time Email & SMS Customer Dispatch Logs</p>
           </div>
         </div>
         <button 
           onClick={fetchLogs} 
-          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg flex items-center gap-1.5"
+          className="logi-btn-outline text-xs py-1.5"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
@@ -45,34 +45,31 @@ export default function NotificationSandbox() {
 
       <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
         {logs.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-xs">
-            No notifications dispatched yet. Change order status to generate live email/SMS logs!
+          <div className="py-8 text-center text-[#667085] text-xs">
+            No notifications dispatched yet. Change an order status to generate live email/SMS logs!
           </div>
         ) : (
           logs.map((item) => (
-            <div key={item.id} className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div key={item.id} className="bg-[#F8FAF7] p-3.5 rounded-lg border border-slate-200 space-y-2 text-xs">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 ${
-                    item.channel === 'EMAIL' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  }`}>
-                    {item.channel === 'EMAIL' ? <Mail className="w-3 h-3" /> : <MessageSquare className="w-3 h-3" />}
+                  <span className={item.channel === 'EMAIL' ? 'logi-badge-forest' : 'logi-badge-success'}>
                     {item.channel}
                   </span>
-                  <span className="font-semibold text-slate-200">
+                  <span className="font-semibold text-[#1F2933]">
                     To: {item.recipient_email || item.recipient_phone}
                   </span>
                 </div>
-                <span className="text-[11px] text-slate-500 font-mono">
+                <span className="text-[11px] text-[#667085] font-mono">
                   {new Date(item.timestamp).toLocaleString()}
                 </span>
               </div>
 
               {item.subject && (
-                <p className="font-bold text-cyan-300 text-xs">{item.subject}</p>
+                <p className="font-bold text-[#176B4D] text-xs">{item.subject}</p>
               )}
               
-              <p className="text-slate-300 whitespace-pre-line text-xs font-mono bg-slate-950/60 p-2.5 rounded-lg border border-slate-900">
+              <p className="text-[#1F2933] whitespace-pre-line text-xs font-mono bg-white p-2.5 rounded border border-slate-200">
                 {item.body}
               </p>
             </div>
