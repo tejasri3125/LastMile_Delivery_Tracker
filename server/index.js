@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { initDB } = require('./db');
 const { router: authRouter } = require('./routes/auth');
 const ordersRouter = require('./routes/orders');
@@ -25,18 +26,19 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve frontend static build if available
-const clientBuildPath = path.join(__dirname, '../client/dist');
+const clientBuildPath = path.resolve(__dirname, '../client/dist');
+const indexHtmlPath = path.join(clientBuildPath, 'index.html');
+
 app.use(express.static(clientBuildPath));
 
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
-    if (err) {
-      res.status(200).send('Last-Mile Delivery Tracker API is running. Start Vite dev server for client interface.');
-    }
-  });
+  if (fs.existsSync(indexHtmlPath)) {
+    return res.sendFile(indexHtmlPath);
+  }
+  res.send('Last-Mile Delivery Management Platform API Server Running');
 });
 
 // Initialize DB and start server
